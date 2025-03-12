@@ -1,0 +1,14 @@
+# 5️⃣ requirements.txt → List of Required Libraries
+# Helps install all dependencies with one command
+
+torch
+torchaudio
+openai-whisper
+opencv-python
+numpy
+sentence-transformers
+faiss-cpu
+pyautogui
+fastapi
+uvicorn
+
