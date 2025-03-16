@@ -11,4 +11,4 @@ faiss-cpu
 pyautogui
 fastapi
 uvicorn
-
+pydub

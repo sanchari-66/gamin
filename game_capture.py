@@ -3,31 +3,62 @@
 # Can process images to detect key elements
 # Optional: Use OCR (Optical Character Recognition) to extract text from the screen
 
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 import pygetwindow as gw
 import pyautogui
 import time
+import re
+
+
+windows = gw.getAllTitles()
+for title in windows:
+    print(title)
+
+def clean_window_title(title):
+    """Removes invisible Unicode characters from window titles."""
+    title = re.sub(r'[\u200b\u202a\u202c]', '', title)  # Remove zero-width characters
+    title = re.sub(r' - Personal - Microsoft Edge$', '', title)  # Remove Edge extra text
+    return title.strip()
+
+def find_game_window():
+    """Finds the correct game window."""
+    game_keywords = ["Valorant", "CSGO", "Apex", "Counter-Strike", "Call of Duty"]
+    windows = gw.getAllTitles()
+
+    for window in windows:
+        if any(keyword.lower() in window.lower() for keyword in game_keywords):
+            return window  # Return the first matching game window
+
+    return None  # No game window found
+
+def focus_window(window_title):
+    windows = gw.getWindowsWithTitle(window_title)
+    if not windows:
+        print(f"❌ Window '{window_title}' not found.")
+        return False
+    try:
+        windows[0].activate()
+        return True
+    except Exception:
+        pyautogui.moveTo(windows[0].left + 50, windows[0].top + 50)
+        pyautogui.click()
+        return True
+
+
+
+import mss
 
 def capture_screen(file_path, window_title):
-    # Get the YouTube game window
-    game_window = None
-    for window in gw.getWindowsWithTitle(window_title):
-        if window_title in window.title:
-            game_window = window
-            break
+    """Captures a screenshot using mss (better for games)."""
+    if not window_title:
+        print("❌ No game window found.")
+        return
 
-    if game_window:
-        # Bring the window to the front
-        game_window.activate()
-        time.sleep(2)  # Allow time for the window to focus
+    if not focus_window(window_title):  # Try to focus window first
+        print(f"⚠️ Could not focus on {window_title}. Screenshot may be incorrect.")
 
-        # Capture only the game window region
-        left, top, width, height = game_window.left, game_window.top, game_window.width, game_window.height
-        screenshot = pyautogui.screenshot(region=(left, top, width, height))
-        screenshot.save(file_path)
-        print(f"Screenshot saved successfully at {file_path}")
-    else:
-        print(f"Window '{window_title}' not found.")
-
-# 🔹 Step 1: Check Available Windows
-print("Available Windows: ", gw.getAllTitles())  
-
+    with mss.mss() as sct:
+        sct.shot(output=file_path)  # Capture entire screen
+        print(f"✅ Screenshot saved at {file_path}")

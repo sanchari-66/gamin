@@ -7,7 +7,7 @@
 # Store and retrieve relevant game knowledge
 
 from speech_to_text import transcribe_audio
-from game_capture import capture_screen
+from game_capture import capture_screen , find_game_window
 from game_context import get_game_advice, add_game_advice, game_memory
 import os
 
@@ -28,7 +28,18 @@ add_game_advice("Learn enemy patterns to anticipate attacks.")
 # screenshot_path = "assets/stare.png"
 # capture_screen(screenshot_path)
 # 🔹 Step 2: Use the Correct YouTube Window Title
-capture_screen("assets/stare.png", "YouTube - Personal - Microsoft\u200b Edge")  # Replace with actual title
+# capture_screen("assets/stare.png", "YouTube - Personal - Microsoft\u200b Edge")  # Replace with actual title
+# 🔹 Step 1: Find the correct YouTube gaming window
+# youtube_window = find_gaming_youtube_window()
+
+# 🔹 Step 2: Capture the screen if a valid YouTube window is found
+game_window = find_game_window()
+
+if game_window:
+    capture_screen("assets/stare.png", game_window)
+else:
+    print("❌ No game window found!")
+ 
 
 # Process game audio
 audio_path = "assets/Tejo Bomb stuck valorant.mp3"
